@@ -1,29 +1,49 @@
 name: Generate Snake
+
 on:
   schedule:
-    - cron: "0 */12 * * *" # 每 12 小时自动跑一次
-  workflow_dispatch:       # 允许手动触发
+    - cron: "0 */12 * * *" # 每 12 小时跑一次
+  workflow_dispatch:
   push:
     branches:
-      - main               # 注意：如果你的默认分支叫 master，这里要改成 master
+      - main
+
 jobs:
   generate:
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write      # 允许 Action 推送代码
+    
     steps:
+      # 1. 生成贪吃蛇的 SVG 图片
       - name: Generate snake SVG
         uses: Platane/snk@v3
         with:
-          github_user_name: ${{ github.repository_owner }}
+          github_user_name: wng409
           outputs: |
             dist/github-contribution-grid-snake.svg
             dist/github-contribution-grid-snake-dark.svg?palette=github-dark
-      - name: Push to output branch
+
+      # 2. 推送到 GitHub 的 output 分支
+      - name: Push to GitHub output branch
         uses: crazy-max/ghaction-github-pages@v4
         with:
           target_branch: output
           build_dir: dist
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. 终极操作：直接推送到 Gitee
+      - name: Mirror to Gitee
+        uses: wearerequired/git-mirror-action@master
+        env:
+          # 使用刚才配置的 Gitee 令牌
+          GITEE_PASSWORD: ${{ secrets.GITEE_TOKEN }}
+        with:
+          # 源仓库：当前 GitHub 仓库
+          source-repo: "git@github.com:wng409/wng409.git"
+          # 目标仓库：你的 Gitee 仓库 (把下面的 wng409 换成你的 Gitee 用户名，如果不一样的话)
+          destination-repo: "https://wng409:${{ secrets.GITEE_TOKEN }}@gitee.com/wng409/wng409.git"
+          # 强制覆盖 Gitee 的内容
+          force: true
