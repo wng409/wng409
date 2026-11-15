@@ -42,6 +42,6 @@ jobs:
           GITEE_PASSWORD: ${{ secrets.GITEE_TOKEN }}
         with:
           # 源仓库：当前 GitHub 仓库
-          source-repo: "git@github.com:wng409/wng409.git"
+          source-repo: "https://github.com/wng409/wng409.git"
           # 目标仓库：你的 Gitee 仓库 (把下面的 wng409 换成你的 Gitee 用户名，如果不一样的话)
           destination-repo: "https://wng409:${{ secrets.GITEE_TOKEN }}@gitee.com/wng409/wng409.git"
